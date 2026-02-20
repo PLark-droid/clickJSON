@@ -1,77 +1,99 @@
 ---
 name: miyabi-monitor
-description: System monitoring and resource analysis using miyabi-mcp-bundle Resource Monitor, Network Inspector, and Process Inspector tools. Use when checking system health, CPU/memory usage, network status, disk space, process analysis, or performance monitoring.
+description: System monitoring via MCP tools. Use when checking CPU, memory, disk, network, process status, or overall system health.
+argument-hint: "[target]"
 ---
 
 # Miyabi System Monitor
 
-35 MCP tools for comprehensive system observability.
+MCP tool prefix: `mcp__miyabi-mcp-bundle__`
 
 ## Quick Commands
 
-### Full System Health
+### Full Health
 ```
-health_check → resource_overview
+mcp__miyabi-mcp-bundle__health_check
+→ mcp__miyabi-mcp-bundle__resource_overview
 ```
 
 ### CPU & Load
 ```
-resource_cpu → resource_load → process_top (limit: 5, sort: cpu)
+mcp__miyabi-mcp-bundle__resource_cpu
+→ mcp__miyabi-mcp-bundle__resource_load
+→ mcp__miyabi-mcp-bundle__process_top (limit: 5, sort: cpu)
 ```
 
-### Memory Analysis
+### Memory
 ```
-resource_memory → process_top (limit: 5, sort: memory)
-→ process_memory_detail (high-usage PID)
+mcp__miyabi-mcp-bundle__resource_memory
+→ mcp__miyabi-mcp-bundle__process_top (limit: 5, sort: memory)
+→ mcp__miyabi-mcp-bundle__process_memory_detail (high-usage PID)
 ```
 
 ### Disk Space
 ```
-resource_disk → file_size_summary (target)
+mcp__miyabi-mcp-bundle__resource_disk
+→ mcp__miyabi-mcp-bundle__file_size_summary (target dir)
 ```
 
 ### Network Status
 ```
-network_overview → network_listening_ports → network_connections
+mcp__miyabi-mcp-bundle__network_overview
+→ mcp__miyabi-mcp-bundle__network_listening_ports
 ```
 
 ### Process Investigation
 ```
-process_search (name) → process_info (PID) → process_children (PID)
-→ process_file_descriptors (PID) → process_ports (PID)
+mcp__miyabi-mcp-bundle__process_search (name)
+→ mcp__miyabi-mcp-bundle__process_info (PID)
+→ mcp__miyabi-mcp-bundle__process_children (PID)
+→ mcp__miyabi-mcp-bundle__process_ports (PID)
 ```
 
-## Monitoring Scenarios
+### Laptop Health
+```
+mcp__miyabi-mcp-bundle__resource_battery
+→ mcp__miyabi-mcp-bundle__resource_temperature
+→ mcp__miyabi-mcp-bundle__resource_uptime
+```
+
+## Scenarios
 
 ### Performance Alert
-When system feels slow:
+**Trigger:** System feels slow, high load
 ```
 resource_overview → resource_cpu → resource_memory → resource_load
 → process_top (limit: 10) → process_cpu_history (suspect PID)
 ```
 
-### Network Diagnostics
-When connectivity issues:
-```
-network_overview → network_ping (target) → network_dns_lookup (hostname)
-→ network_traceroute (target) → network_port_check (host, port)
-```
-
-### Laptop Health
-```
-resource_battery → resource_temperature → resource_uptime
-```
-
 ### Pre-Deploy Check
-Before deploying:
 ```
 resource_overview → resource_disk → network_listening_ports
-→ process_search (app name) → docker_ps (if using containers)
+→ process_search (app) → docker_ps (if containers)
 ```
 
-## Rules
-1. Always start with `resource_overview` or `health_check` for broad picture
-2. Use `process_top` to identify resource hogs
-3. Drill into specific PID with `process_info`, `process_memory_detail`, `process_cpu_history`
-4. For network, always verify with `network_ping` before deeper investigation
-5. Report findings with specific numbers and actionable suggestions
+## Alert Thresholds (for reporting)
+
+| Metric | Warning | Critical |
+|--------|---------|----------|
+| CPU | > 70% sustained | > 90% sustained |
+| Memory | > 80% used | > 95% used |
+| Disk | > 80% full | > 95% full |
+| Load | > core count | > 2x core count |
+
+## Failure Handling
+
+- Tool returns error → fall back to equivalent CLI (`top`, `df`, `free`, etc.)
+- Permission denied → report which tool needs elevated access
+- Unsupported on platform → skip and note (e.g., `resource_temperature` may not work on all Macs)
+
+## Output Format
+
+```
+System: [hostname] | Uptime: [time]
+CPU: [usage%] | Load: [1/5/15 min]
+Memory: [used/total] ([%])
+Disk: [used/total] ([%]) on [mount]
+Alert: [any threshold breaches]
+Top Process: [name] PID [pid] CPU [%] MEM [%]
+```

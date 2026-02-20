@@ -1,58 +1,66 @@
 ---
 name: miyabi-docker
-description: Docker and Docker Compose management using miyabi-mcp-bundle container tools. Use when managing containers, images, builds, compose services, or debugging container issues.
+description: Docker and Compose management via MCP tools. Use when managing containers, images, builds, compose services, or debugging container issues.
+argument-hint: "[action] [target]"
 ---
 
 # Miyabi Docker Operations
 
-14 MCP tools for container lifecycle management.
+MCP tool prefix: `mcp__miyabi-mcp-bundle__`
 
 ## Workflows
 
-### Health Check (状態確認)
+### Health Check
 ```
-docker_ps → docker_stats
-```
-Shows all containers with live resource usage.
-
-### Debug Container (コンテナデバッグ)
-```
-docker_ps → docker_logs (container, tail: 100)
-→ docker_inspect (container) → docker_exec (container, command: "sh")
+mcp__miyabi-mcp-bundle__docker_ps
+→ mcp__miyabi-mcp-bundle__docker_stats
 ```
 
-### Build & Deploy (ビルド・デプロイ)
+### Debug Container
 ```
-docker_build (path, tag) → docker_images → docker_ps
+mcp__miyabi-mcp-bundle__docker_ps
+→ mcp__miyabi-mcp-bundle__docker_logs (container, tail: 100)
+→ mcp__miyabi-mcp-bundle__docker_inspect (container)
+→ mcp__miyabi-mcp-bundle__docker_exec (container, command: "/bin/sh")
 ```
+If `/bin/sh` fails, try `/bin/bash`. If both fail, report shell unavailability.
 
-### Lifecycle Management (ライフサイクル)
-- Start: `docker_start (container)`
-- Stop: `docker_stop (container)`
-- Restart: `docker_restart (container)`
-
-### Compose Workflow (Compose管理)
+### Build
 ```
-compose_ps → compose_logs (service, tail: 50)
+mcp__miyabi-mcp-bundle__docker_build (path, tag)
+→ mcp__miyabi-mcp-bundle__docker_images
+→ mcp__miyabi-mcp-bundle__docker_ps
 ```
-- Start: `compose_up (detach: true)`
-- Stop: `compose_down`
+If build fails: suggest `--no-cache` rebuild, check Dockerfile context.
 
-## Tool Reference
+### Lifecycle
+- Start: `mcp__miyabi-mcp-bundle__docker_start (container)`
+- Stop: `mcp__miyabi-mcp-bundle__docker_stop (container)`
+- Restart: `mcp__miyabi-mcp-bundle__docker_restart (container)`
 
-| Tool | Purpose | Key Args |
-|------|---------|----------|
-| `docker_ps` | List containers | all (bool) |
-| `docker_images` | List images | - |
-| `docker_logs` | Container logs | container, tail |
-| `docker_inspect` | Detailed config | container_or_image |
-| `docker_stats` | Live CPU/memory | container (optional) |
-| `docker_exec` | Run command | container, command |
-| `docker_start` | Start container | container |
-| `docker_stop` | Stop container | container |
-| `docker_restart` | Restart | container |
-| `docker_build` | Build image | path, tag |
-| `compose_ps` | Compose status | project_dir |
-| `compose_up` | Start services | project_dir, detach |
-| `compose_down` | Stop services | project_dir |
-| `compose_logs` | Service logs | project_dir, service, tail |
+### Compose
+```
+mcp__miyabi-mcp-bundle__compose_ps
+→ mcp__miyabi-mcp-bundle__compose_logs (service, tail: 50)
+```
+- Start: `mcp__miyabi-mcp-bundle__compose_up (detach: true)`
+- Stop: `mcp__miyabi-mcp-bundle__compose_down`
+
+## Failure Handling
+
+| Error | Action |
+|-------|--------|
+| Docker daemon not running | Report to user, suggest starting Docker |
+| Image not found | Check `docker_images`, suggest `docker_build` or `docker pull` |
+| Container OOMKilled | `docker_inspect` for memory limits, suggest increasing |
+| Build context too large | Suggest `.dockerignore` review |
+| Compose file not found | Check working directory for `docker-compose.yml` / `compose.yml` |
+| Tool fails | Fall back to `docker` / `docker compose` CLI |
+
+## Output Format
+
+```
+Containers: [N running, N stopped]
+[container_name]: [status] | CPU [%] | MEM [MB/limit]
+Action: [recommendation]
+```

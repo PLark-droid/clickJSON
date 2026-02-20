@@ -1,68 +1,95 @@
 ---
 name: miyabi-debug
-description: Systematic debugging using miyabi-mcp-bundle tools for logs, processes, network, and system diagnostics. Use when troubleshooting errors, crashes, performance issues, connection problems, port conflicts, or unresponsive services.
+description: Systematic multi-layer debugging via MCP tools. Use when troubleshooting errors, crashes, performance issues, connection problems, or port conflicts.
+argument-hint: "[symptom] [target]"
 ---
 
 # Miyabi Debug Assistant
 
-Multi-layer diagnostic toolkit. Start broad, drill down.
+MCP tool prefix: `mcp__miyabi-mcp-bundle__`
 
-## Diagnostic Flowchart
+Start broad, drill down. Each layer has entry/exit criteria.
 
-### Layer 1: Quick Triage
-Always start here:
+## Diagnostic Layers
+
+### Layer 1: Quick Triage (always start here)
 ```
-health_check → resource_overview
+mcp__miyabi-mcp-bundle__health_check
+→ mcp__miyabi-mcp-bundle__resource_overview
 ```
+**Exit:** If all green → ask user for more detail. If red → go to matching layer.
 
 ### Layer 2: Error Investigation
-On application error or crash:
+**Entry:** Application error, crash, unexpected behavior
 ```
-log_get_errors → log_search (error pattern) → process_search (app name)
+mcp__miyabi-mcp-bundle__log_get_errors
+→ mcp__miyabi-mcp-bundle__log_search (error pattern)
+→ mcp__miyabi-mcp-bundle__process_search (app name)
 ```
-If process found: `process_info → process_cpu_history → process_memory_detail`
-If process missing: check if it crashed, review logs.
+If process found → `process_info` → `process_cpu_history`
+If process missing → likely crashed. Check logs for last activity.
+**Exit:** Root cause identified or escalate to Layer 5.
 
 ### Layer 3: Network Issues
-On connection failure or timeout:
+**Entry:** Connection refused, timeout, DNS failure
 ```
-network_overview → network_ping (target host) → network_dns_lookup (hostname)
-→ network_port_check (host, port) → network_ssl_check (if HTTPS)
+mcp__miyabi-mcp-bundle__network_overview
+→ mcp__miyabi-mcp-bundle__network_ping (target)
+→ mcp__miyabi-mcp-bundle__network_dns_lookup (hostname)
+→ mcp__miyabi-mcp-bundle__network_port_check (host, port)
 ```
+If HTTPS: add `mcp__miyabi-mcp-bundle__network_ssl_check`
+**Exit:** Connectivity issue pinpointed or escalate.
 
 ### Layer 4: Port Conflicts
-On "address already in use" / bind error:
+**Entry:** "Address already in use", bind error
 ```
-network_listening_ports → process_ports (conflicting PID)
-→ process_info (PID) → process_search (name)
+mcp__miyabi-mcp-bundle__network_listening_ports
+→ mcp__miyabi-mcp-bundle__process_ports (conflicting PID)
+→ mcp__miyabi-mcp-bundle__process_info (PID)
 ```
+**Exit:** Report which process holds the port. Do NOT auto-kill.
 
-### Layer 5: Performance Degradation
-On slow response or high load:
+### Layer 5: Performance
+**Entry:** Slow response, high load, CPU/memory spike
 ```
-resource_cpu → resource_memory → resource_load
-→ process_top (limit: 10) → process_cpu_history (suspect PID)
-→ process_threads (suspect PID)
+mcp__miyabi-mcp-bundle__resource_cpu
+→ mcp__miyabi-mcp-bundle__resource_memory
+→ mcp__miyabi-mcp-bundle__process_top (limit: 10)
+→ mcp__miyabi-mcp-bundle__process_cpu_history (suspect PID)
+→ mcp__miyabi-mcp-bundle__process_threads (suspect PID)
 ```
+**Exit:** Top offender identified with resource trend.
 
-### Layer 6: Disk Issues
-On "no space left" or I/O errors:
+### Layer 6: Disk
+**Entry:** "No space left", I/O errors
 ```
-resource_disk → file_size_summary (target dir)
-→ file_duplicates (target dir) → log_stats
+mcp__miyabi-mcp-bundle__resource_disk
+→ mcp__miyabi-mcp-bundle__file_size_summary (target dir)
+→ mcp__miyabi-mcp-bundle__file_duplicates (target dir)
 ```
+**Exit:** Largest consumers identified.
 
-### Layer 7: Container Issues
-On Docker/container problems:
+### Layer 7: Container
+**Entry:** Container won't start, unhealthy, OOMKilled
 ```
-docker_ps → docker_logs (container) → docker_inspect (container)
-→ docker_stats → docker_exec (diagnostic command)
+mcp__miyabi-mcp-bundle__docker_ps
+→ mcp__miyabi-mcp-bundle__docker_logs (container, tail: 100)
+→ mcp__miyabi-mcp-bundle__docker_inspect (container)
 ```
+**Exit:** Container state + error identified.
 
-## Rules
+## Failure Handling
 
-1. **Always Layer 1 first** - Quick triage before deep dive
-2. **Follow the evidence** - Let tool output guide next tool call
-3. **Parallel independent checks** - Call unrelated tools simultaneously
-4. **Report actionable findings** - Don't dump raw output; summarize with fix suggestions
-5. **Escalate when stuck** - If 3 layers deep with no answer, suggest manual investigation paths
+- Tool returns error → retry once, then fall back to equivalent CLI command
+- 3 layers deep with no answer → report findings so far and suggest manual investigation
+- Never auto-kill processes or restart services without user confirmation
+
+## Output Template
+
+```
+Symptom: [what user reported]
+Observation: [what tools found]
+Diagnosis: [likely root cause]
+Action: [specific fix recommendation]
+```

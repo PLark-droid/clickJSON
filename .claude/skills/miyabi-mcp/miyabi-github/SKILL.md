@@ -1,91 +1,73 @@
 ---
 name: miyabi-github
-description: GitHub operations using miyabi-mcp-bundle GitHub Integration tools. Use when managing issues, pull requests, reviews, labels, releases, CI/CD workflows, or repository metadata on GitHub.
-argument-hint: "[action] [target]"
+description: GitHub operations via MCP tools. Use when managing issues, PRs, reviews, labels, CI/CD workflows, or releases.
+argument-hint: "[action] [number|ref]"
 ---
 
 # Miyabi GitHub Operations
 
-21 MCP tools for full GitHub lifecycle management.
+MCP tool prefix: `mcp__miyabi-mcp-bundle__`
 
-## Operation Workflows
+## Workflows
 
-### Issue Management
-**Create from bug report:**
+### Issue Triage
 ```
-github_create_issue (title, body, labels) → github_add_labels
-```
-
-**Triage existing issues:**
-```
-github_list_issues (state: open, sort: created) → github_get_issue (number)
-→ github_add_labels → github_update_issue (assignees)
+mcp__miyabi-mcp-bundle__github_list_issues (state: open)
+→ mcp__miyabi-mcp-bundle__github_get_issue (number)
+→ mcp__miyabi-mcp-bundle__github_add_labels
 ```
 
-**Close with comment:**
+### Create Issue
 ```
-github_add_comment (issue, body) → github_update_issue (state: closed)
-```
-
-### Pull Request Lifecycle
-**Create PR:**
-```
-github_create_pr (title, body, base, head) → github_add_labels
+mcp__miyabi-mcp-bundle__github_create_issue (title, body)
+→ mcp__miyabi-mcp-bundle__github_add_labels
 ```
 
-**Review PR:**
+### PR Review
 ```
-github_get_pr (number) → github_list_pr_reviews (number)
-→ github_create_review (event: COMMENT/APPROVE/REQUEST_CHANGES)
-→ github_submit_review
-```
-
-**Merge PR:**
-```
-github_get_pr → github_list_pr_reviews (check approvals)
-→ github_merge_pr (merge_method: squash/merge/rebase)
+mcp__miyabi-mcp-bundle__github_get_pr (number)
+→ mcp__miyabi-mcp-bundle__github_list_pr_reviews (number)
+→ mcp__miyabi-mcp-bundle__github_create_review
+→ mcp__miyabi-mcp-bundle__github_submit_review
 ```
 
-### CI/CD Monitoring
-**Check workflow status:**
+### PR Merge (confirm with user first)
 ```
-github_list_workflows → github_list_workflow_runs (workflow_id)
+mcp__miyabi-mcp-bundle__github_get_pr (check mergeable)
+→ mcp__miyabi-mcp-bundle__github_list_pr_reviews (check approvals)
+→ mcp__miyabi-mcp-bundle__github_merge_pr (merge_method: squash)
 ```
-If failed: investigate logs and suggest fix.
+**Merge strategy:** squash for feature branches, merge for release branches.
 
-### Repository Management
-**Overview:**
+### CI/CD Check
 ```
-github_repo_info → github_list_branches → github_list_labels
+mcp__miyabi-mcp-bundle__github_list_workflows
+→ mcp__miyabi-mcp-bundle__github_list_workflow_runs (workflow_id)
+```
+If failed: report workflow name, run URL, and failure reason.
+
+### Release
+```
+mcp__miyabi-mcp-bundle__github_list_releases
+→ mcp__miyabi-mcp-bundle__github_compare_commits (last_tag...HEAD)
+→ mcp__miyabi-mcp-bundle__github_list_milestones
 ```
 
-**Release management:**
-```
-github_list_releases → github_list_milestones → github_compare_commits (tag..HEAD)
-```
+## Failure Handling
 
-## Tool Reference
+| Error | Action |
+|-------|--------|
+| 401 Unauthorized | Token missing/expired. Report to user |
+| 403 Forbidden | Insufficient permissions. Check token scopes |
+| 404 Not Found | Wrong repo/number. Verify with `github_repo_info` |
+| 422 Validation | Invalid input. Show API error message to user |
+| Rate limit | Report remaining quota, suggest waiting |
+| Tool fails | Fall back to `gh` CLI equivalent |
 
-| Tool | Purpose |
-|------|---------|
-| `github_list_issues` | List with filters (state, labels, sort) |
-| `github_get_issue` | Full details by number |
-| `github_create_issue` | New issue (title, body, labels, assignees) |
-| `github_update_issue` | Update title/body/state/labels/assignees |
-| `github_add_comment` | Comment on issue or PR |
-| `github_list_prs` | List PRs with filters |
-| `github_get_pr` | PR details + diff stats |
-| `github_create_pr` | New PR (title, body, base, head) |
-| `github_merge_pr` | Merge with strategy |
-| `github_list_labels` | All labels |
-| `github_add_labels` | Add labels to issue/PR |
-| `github_list_milestones` | Milestones |
-| `github_list_workflows` | GitHub Actions workflows |
-| `github_list_workflow_runs` | Recent runs |
-| `github_repo_info` | Repo metadata |
-| `github_list_releases` | Releases |
-| `github_list_branches` | Branches + protection |
-| `github_compare_commits` | Diff between refs |
-| `github_list_pr_reviews` | Reviews on PR |
-| `github_create_review` | Create review |
-| `github_submit_review` | Submit review |
+## Output Format
+
+```
+[Action]: [result summary]
+URL: [link to issue/PR/workflow]
+Next: [recommended follow-up action]
+```
