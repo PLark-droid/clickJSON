@@ -1,11 +1,13 @@
-export type AtsType = "HRMOS" | "HERP" | null;
+const HRMOS_AGENT_HOST = "hrmos.co";
+const HRMOS_AGENT_DETAIL_PATH =
+  /^\/agent\/corporates\/[^/]+\/jobs\/[^/]+\/detail\/?$/;
 
-const HRMOS_PATTERN = /hrmos\.co\/pages\/[^/]+\/jobs\//;
-const HERP_PATTERN =
-  /(?:herp\.cloud\/[^/]+\/jobs\/|[^/]+\.herp\.cloud\/|herp\.careers\/v1\/)/;
-
-export function detectAts(url: string): AtsType {
-  if (HRMOS_PATTERN.test(url)) return "HRMOS";
-  if (HERP_PATTERN.test(url)) return "HERP";
-  return null;
+export function isHrmosAgent(url: string): boolean {
+  try {
+    const target = new URL(url);
+    if (target.hostname !== HRMOS_AGENT_HOST) return false;
+    return HRMOS_AGENT_DETAIL_PATH.test(target.pathname);
+  } catch {
+    return false;
+  }
 }

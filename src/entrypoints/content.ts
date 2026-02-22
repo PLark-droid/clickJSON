@@ -1,28 +1,20 @@
-import { detectAts } from "@/utils/detector";
-import { getExtractor } from "@/extractors/base";
+import { isHrmosAgent } from "@/utils/detector";
+import { extractHrmosAgent } from "@/extractors/hrmos";
 
 export default defineContentScript({
-  matches: [
-    "*://hrmos.co/pages/*/jobs/*",
-    "*://herp.cloud/*/jobs/*",
-    "*://*.herp.cloud/*",
-    "*://herp.careers/v1/*",
-  ],
+  matches: ["*://hrmos.co/agent/corporates/*/jobs/*/detail*"],
   main() {
-    // background からの抽出リクエストを処理
     browser.runtime.onMessage.addListener(
       (message: unknown, _sender, sendResponse) => {
         const msg = message as { type?: string };
         if (msg.type === "extract") {
           const url = location.href;
-          const ats = detectAts(url);
 
-          if (!ats) {
+          if (!isHrmosAgent(url)) {
             sendResponse({ error: "対応していないページです" });
           } else {
             try {
-              const extractor = getExtractor(ats);
-              const posting = extractor.extract(document, url);
+              const posting = extractHrmosAgent(document, url);
               sendResponse({ data: posting });
             } catch (e) {
               sendResponse({
