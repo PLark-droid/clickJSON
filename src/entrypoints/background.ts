@@ -1,12 +1,13 @@
-import { isHrmosAgent } from "@/utils/detector";
+import { detectAgent } from "@/utils/detector";
 
 export default defineBackground(() => {
-  // タブ更新時にHRMOS Agent判定してバッジ表示
+  // タブ更新時に対応ページ判定してバッジ表示
   browser.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
     if (changeInfo.status !== "complete" || !tab.url) return;
 
-    if (isHrmosAgent(tab.url)) {
-      await browser.action.setBadgeText({ tabId, text: "ON" });
+    const ats = detectAgent(tab.url);
+    if (ats) {
+      await browser.action.setBadgeText({ tabId, text: ats });
       await browser.action.setBadgeBackgroundColor({ tabId, color: "#4CAF50" });
     } else {
       await browser.action.setBadgeText({ tabId, text: "" });

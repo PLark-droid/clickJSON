@@ -1,4 +1,4 @@
-import { isHrmosAgent } from "@/utils/detector";
+import { detectAgent } from "@/utils/detector";
 import { copyToClipboard } from "@/utils/clipboard";
 import type { JobPosting } from "@/types/job-posting";
 
@@ -23,12 +23,13 @@ async function init() {
       return;
     }
 
-    if (!isHrmosAgent(tab.url)) {
-      statusEl.textContent = "HRMOS Agent の求人ページではありません";
+    const ats = detectAgent(tab.url);
+    if (!ats) {
+      statusEl.textContent = "対応していないページです";
       return;
     }
 
-    statusEl.textContent = "HRMOS Agent 求人ページを検出";
+    statusEl.textContent = `${ats} Agent 求人ページを検出`;
     extractBtn.disabled = false;
   } catch (e) {
     console.error("Failed to initialize popup", e);
@@ -38,6 +39,9 @@ async function init() {
 
 extractBtn.addEventListener("click", async () => {
   extractBtn.disabled = true;
+  copyBtn.hidden = true;
+  resultEl.hidden = true;
+  lastResult = null;
   statusEl.textContent = "抽出中...";
 
   try {
