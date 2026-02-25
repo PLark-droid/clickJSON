@@ -41,6 +41,19 @@ export function extractHerpAgent(doc: Document, url: string): JobPosting {
     work_schedule: getRowValue(doc, "勤務体系"),
     probation: getRowValue(doc, "試用期間"),
     other: getRowValue(doc, "その他"),
+    department: null,
+    career_path: null,
+    onboarding: null,
+    work_environment: null,
+    contract_period: null,
+    allowances: null,
+    raise_bonus: null,
+    overtime: null,
+    holidays: null,
+    vacation: null,
+    insurance: null,
+    smoking_policy: null,
+    work_style: null,
 
     // エージェント用追記事項
     agent_info: null,
@@ -51,6 +64,8 @@ export function extractHerpAgent(doc: Document, url: string): JobPosting {
     recruitment_period: getRowValue(doc, "募集期間"),
     compensation: getRowValue(doc, "待遇"),
     priority: getRowValue(doc, "優先度"),
+    target_companies: null,
+    contact: null,
 
     // 企業情報
     company: getCompanyFromTitle(doc),

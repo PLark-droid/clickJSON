@@ -1,11 +1,14 @@
 import { detectAgent } from "@/utils/detector";
 import { extractHrmosAgent } from "@/extractors/hrmos";
 import { extractHerpAgent } from "@/extractors/herp";
+import { extractTalentioAgent } from "@/extractors/talentio";
+import type { JobPosting } from "@/types/job-posting";
 
 export default defineContentScript({
   matches: [
     "*://hrmos.co/agent/corporates/*/jobs/*/detail*",
     "*://agent.herp.cloud/p/*/requisitions/id/*",
+    "*://agent.talentio.com/r/ats/requisitions/*/candidates/new*",
   ],
   main() {
     browser.runtime.onMessage.addListener(
@@ -19,10 +22,14 @@ export default defineContentScript({
             sendResponse({ error: "対応していないページです" });
           } else {
             try {
-              const posting =
-                ats === "HRMOS"
-                  ? extractHrmosAgent(document, url)
-                  : extractHerpAgent(document, url);
+              let posting: JobPosting;
+              if (ats === "HRMOS") {
+                posting = extractHrmosAgent(document, url);
+              } else if (ats === "HERP") {
+                posting = extractHerpAgent(document, url);
+              } else {
+                posting = extractTalentioAgent(document, url);
+              }
               sendResponse({ data: posting });
             } catch (e) {
               sendResponse({

@@ -1,5 +1,5 @@
 export interface JobPosting {
-  source_ats: "HRMOS" | "HERP";
+  source_ats: "HRMOS" | "HERP" | "TALENTIO";
 
   // 求人情報
   position: string | null;
@@ -17,6 +17,19 @@ export interface JobPosting {
   work_schedule: string | null;
   probation: string | null;
   other: string | null;
+  department: string | null;
+  career_path: string | null;
+  onboarding: string | null;
+  work_environment: string | null;
+  contract_period: string | null;
+  allowances: string | null;
+  raise_bonus: string | null;
+  overtime: string | null;
+  holidays: string | null;
+  vacation: string | null;
+  insurance: string | null;
+  smoking_policy: string | null;
+  work_style: string | null;
 
   // エージェント向け情報
   agent_info: string | null;
@@ -27,6 +40,8 @@ export interface JobPosting {
   recruitment_period: string | null;
   compensation: string | null;
   priority: string | null;
+  target_companies: string | null;
+  contact: string | null;
 
   // 企業情報
   company: string | null;
