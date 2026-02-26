@@ -2,6 +2,7 @@ import { detectAgent } from "@/utils/detector";
 import { extractHrmosAgent } from "@/extractors/hrmos";
 import { extractHerpAgent } from "@/extractors/herp";
 import { extractTalentioAgent } from "@/extractors/talentio";
+import { extractPersonaAgent } from "@/extractors/persona";
 import type { JobPosting } from "@/types/job-posting";
 
 export default defineContentScript({
@@ -9,6 +10,7 @@ export default defineContentScript({
     "*://hrmos.co/agent/corporates/*/jobs/*/detail*",
     "*://agent.herp.cloud/p/*/requisitions/id/*",
     "*://agent.talentio.com/r/ats/requisitions/*/candidates/new*",
+    "*://www.agent.persona-ats.com/*",
   ],
   main() {
     browser.runtime.onMessage.addListener(
@@ -27,8 +29,10 @@ export default defineContentScript({
                 posting = extractHrmosAgent(document, url);
               } else if (ats === "HERP") {
                 posting = extractHerpAgent(document, url);
-              } else {
+              } else if (ats === "TALENTIO") {
                 posting = extractTalentioAgent(document, url);
+              } else {
+                posting = extractPersonaAgent(document, url);
               }
               sendResponse({ data: posting });
             } catch (e) {

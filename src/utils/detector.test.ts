@@ -14,6 +14,12 @@ describe("detectAgent", () => {
         "https://agent.talentio.com/r/ats/requisitions/abc/candidates/new",
       ),
     ).toBe("TALENTIO");
+    expect(
+      detectAgent("https://www.agent.persona-ats.com/"),
+    ).toBe("PERSONA");
+    expect(
+      detectAgent("https://www.agent.persona-ats.com/some/path"),
+    ).toBe("PERSONA");
   });
 
   it("returns null for unsupported or invalid URL", () => {

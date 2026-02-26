@@ -54,6 +54,10 @@ export function extractHerpAgent(doc: Document, url: string): JobPosting {
     insurance: null,
     smoking_policy: null,
     work_style: null,
+    faq: null,
+    scope_change_work: null,
+    scope_change_location: null,
+    reference_url: null,
 
     // エージェント用追記事項
     agent_info: null,

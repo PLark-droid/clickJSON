@@ -1,4 +1,4 @@
-export type AtsType = "HRMOS" | "HERP" | "TALENTIO" | null;
+export type AtsType = "HRMOS" | "HERP" | "TALENTIO" | "PERSONA" | null;
 
 const HRMOS_AGENT_DETAIL_PATH =
   /^\/agent\/corporates\/[^/]+\/jobs\/[^/]+\/detail\/?$/;
@@ -27,6 +27,9 @@ export function detectAgent(url: string): AtsType {
       TALENTIO_AGENT_REQUISITION_PATH.test(target.pathname)
     ) {
       return "TALENTIO";
+    }
+    if (target.hostname === "www.agent.persona-ats.com") {
+      return "PERSONA";
     }
   } catch {
     /* invalid URL */

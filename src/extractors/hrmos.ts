@@ -61,6 +61,10 @@ export function extractHrmosAgent(doc: Document, url: string): JobPosting {
     insurance: null,
     smoking_policy: null,
     work_style: null,
+    faq: null,
+    scope_change_work: null,
+    scope_change_location: null,
+    reference_url: null,
 
     agent_info: getRowValue(doc, "エージェント向け情報"),
     recruitment_background: null,
