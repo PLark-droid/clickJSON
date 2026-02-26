@@ -1,5 +1,5 @@
 export interface JobPosting {
-  source_ats: "HRMOS" | "HERP" | "TALENTIO";
+  source_ats: "HRMOS" | "HERP" | "TALENTIO" | "PERSONA";
 
   // 求人情報
   position: string | null;
@@ -30,6 +30,10 @@ export interface JobPosting {
   insurance: string | null;
   smoking_policy: string | null;
   work_style: string | null;
+  faq: string | null;
+  scope_change_work: string | null;
+  scope_change_location: string | null;
+  reference_url: string | null;
 
   // エージェント向け情報
   agent_info: string | null;

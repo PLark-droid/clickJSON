@@ -91,6 +91,11 @@ export function extractTalentioAgent(
     agent_info: getFieldValue(doc, "補足情報"),
     contact: getFieldValue(doc, "担当者連絡先"),
 
+    faq: null,
+    scope_change_work: null,
+    scope_change_location: null,
+    reference_url: null,
+
     // Talentio に該当なし
     qualifications: null,
     job_details: null,
