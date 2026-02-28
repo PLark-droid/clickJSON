@@ -2,7 +2,7 @@
   "name": "click-json",
   "description": "Chrome拡張: HRMOS/HERP求人票から構造化JSONを抽出",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
   "scripts": {
     "dev": "wxt",

@@ -5,6 +5,6 @@ export default defineConfig({
   manifest: {
     name: "clickJSON",
     description: "HRMOS/HERPの求人票ページから構造化JSONを抽出",
-    permissions: ["activeTab", "tabs"],
+    permissions: ["activeTab", "tabs", "scripting"],
   },
 });

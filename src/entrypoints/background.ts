@@ -35,7 +35,21 @@ export default defineBackground(() => {
             });
             sendResponse(result);
           } catch {
-            sendResponse({ error: "Content Script と通信できません" });
+            try {
+              await browser.scripting.executeScript({
+                target: { tabId: tab.id },
+                files: ["content-scripts/content.js"],
+              });
+              const retriedResult = await browser.tabs.sendMessage(tab.id, {
+                type: "extract",
+              });
+              sendResponse(retriedResult);
+            } catch {
+              sendResponse({
+                error:
+                  "Content Script と通信できません。ページをリロードしてから再度お試しください。",
+              });
+            }
           }
         })();
       }
