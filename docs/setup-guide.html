@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>clickJSON セットアップガイド</title>
+<style>
+  :root {
+    --primary: #4CAF50;
+    --primary-light: #E8F5E9;
+    --accent: #2196F3;
+    --accent-light: #E3F2FD;
+    --warning: #FF9800;
+    --warning-light: #FFF3E0;
+    --text: #333;
+    --text-light: #666;
+    --bg: #FAFAFA;
+    --card: #FFFFFF;
+    --border: #E0E0E0;
+    --radius: 8px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', 'Yu Gothic UI', 'Hiragino Sans', 'Meiryo', sans-serif;
+    color: var(--text);
+    background: var(--bg);
+    line-height: 1.7;
+    font-size: 15px;
+  }
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 32px 24px;
+  }
+  header {
+    text-align: center;
+    margin-bottom: 40px;
+    padding-bottom: 24px;
+    border-bottom: 2px solid var(--primary);
+  }
+  header h1 {
+    font-size: 28px;
+    color: var(--primary);
+    margin-bottom: 8px;
+  }
+  header .subtitle {
+    color: var(--text-light);
+    font-size: 14px;
+  }
+  header .version {
+    display: inline-block;
+    background: var(--primary);
+    color: #fff;
+    font-size: 12px;
+    padding: 2px 10px;
+    border-radius: 12px;
+    margin-top: 8px;
+  }
+  h2 {
+    font-size: 20px;
+    color: var(--primary);
+    margin: 32px 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  h3 {
+    font-size: 16px;
+    color: var(--text);
+    margin: 20px 0 8px;
+  }
+  p { margin-bottom: 12px; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .step {
+    position: relative;
+    padding-left: 48px;
+    margin-bottom: 28px;
+  }
+  .step-number {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 36px;
+    height: 36px;
+    background: var(--primary);
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 16px;
+  }
+  .step h3 {
+    margin-top: 4px;
+    margin-bottom: 8px;
+  }
+  .illustration {
+    margin: 16px 0;
+    text-align: center;
+  }
+  .illustration svg {
+    max-width: 100%;
+    height: auto;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+  .illustration .caption {
+    font-size: 13px;
+    color: var(--text-light);
+    margin-top: 6px;
+  }
+  .note {
+    background: var(--accent-light);
+    border-left: 4px solid var(--accent);
+    padding: 12px 16px;
+    border-radius: 0 var(--radius) var(--radius) 0;
+    margin: 12px 0;
+    font-size: 14px;
+  }
+  .warning {
+    background: var(--warning-light);
+    border-left: 4px solid var(--warning);
+    padding: 12px 16px;
+    border-radius: 0 var(--radius) var(--radius) 0;
+    margin: 12px 0;
+    font-size: 14px;
+  }
+  .ats-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+    font-size: 14px;
+  }
+  .ats-table th, .ats-table td {
+    border: 1px solid var(--border);
+    padding: 10px 12px;
+    text-align: left;
+  }
+  .ats-table th {
+    background: var(--primary-light);
+    font-weight: 600;
+  }
+  .ats-table tr:nth-child(even) td {
+    background: #FAFAFA;
+  }
+  code {
+    background: #F0F0F0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Consolas', 'MS Gothic', monospace;
+    font-size: 13px;
+  }
+  .kbd {
+    display: inline-block;
+    background: #F5F5F5;
+    border: 1px solid #CCC;
+    border-bottom: 2px solid #BBB;
+    border-radius: 3px;
+    padding: 1px 6px;
+    font-family: 'Consolas', 'MS Gothic', monospace;
+    font-size: 13px;
+  }
+  .troubleshooting dt {
+    font-weight: 600;
+    margin-top: 16px;
+    margin-bottom: 4px;
+    color: var(--text);
+  }
+  .troubleshooting dd {
+    margin-left: 16px;
+    margin-bottom: 12px;
+    color: var(--text-light);
+  }
+  footer {
+    text-align: center;
+    color: var(--text-light);
+    font-size: 13px;
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+  }
+  @media print {
+    body { background: #fff; font-size: 12px; }
+    .container { max-width: 100%; padding: 0; }
+    .card { box-shadow: none; break-inside: avoid; }
+    .step { break-inside: avoid; }
+    h2 { break-after: avoid; }
+  }
+  @media (max-width: 600px) {
+    .container { padding: 16px; }
+    header h1 { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>clickJSON</h1>
+  <p class="subtitle">ATS求人票から構造化JSONを抽出するChrome拡張機能</p>
+  <span class="version">v0.2.0</span>
+</header>
+
+<!-- ============================================================ -->
+<h2>1. clickJSON とは</h2>
+<div class="card">
+  <p><strong>clickJSON</strong> は、人材エージェント向けのATS（採用管理システム）の求人票ページから、構造化されたJSON形式のデータを自動抽出するChrome拡張機能です。</p>
+  <p>対応ATSの求人票ページを開いた状態で、ワンクリックで求人情報をJSON化しクリップボードにコピーできます。</p>
+</div>
+
+<h3>対応ATS一覧</h3>
+<table class="ats-table">
+  <thead>
+    <tr><th>ATS名</th><th>対応ドメイン</th><th>対応ページ</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>HRMOS</strong></td><td>hrmos.co</td><td>Agent 求人詳細ページ</td></tr>
+    <tr><td><strong>HERP</strong></td><td>agent.herp.cloud</td><td>Agent 求人要件ページ</td></tr>
+    <tr><td><strong>Talentio</strong></td><td>agent.talentio.com</td><td>Agent 求人候補者推薦ページ</td></tr>
+    <tr><td><strong>PERSONA</strong></td><td>www.agent.persona-ats.com</td><td>Agent 求人詳細ページ</td></tr>
+  </tbody>
+</table>
+
+<!-- ============================================================ -->
+<h2>2. 事前準備</h2>
+<div class="card">
+  <p>以下のいずれかのブラウザがインストールされていることを確認してください。</p>
+  <ul style="margin-left: 20px; margin-top: 8px;">
+    <li><strong>Google Chrome</strong>（推奨・バージョン 90 以上）</li>
+    <li><strong>Microsoft Edge</strong>（Chromiumベース・バージョン 90 以上）</li>
+  </ul>
+  <div class="note">
+    バージョンの確認方法: アドレスバーに <code>chrome://version</code> と入力して Enter を押してください。
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>3. インストール手順</h2>
+
+<!-- Step 1 -->
+<div class="step">
+  <div class="step-number">1</div>
+  <h3>配布ファイルをダウンロード＆解凍</h3>
+  <p>配布された <code>clickJSON-v0.2.0.zip</code> をデスクトップなど分かりやすい場所にダウンロードし、<strong>右クリック</strong> → <strong>「すべて展開」</strong> で解凍してください。</p>
+
+  <div class="illustration">
+    <svg width="520" height="160" viewBox="0 0 520 160" xmlns="http://www.w3.org/2000/svg">
+      <rect width="520" height="160" fill="#F5F5F5" rx="8"/>
+      <!-- zip file -->
+      <rect x="30" y="30" width="120" height="100" fill="#FFF" stroke="#CCC" rx="4"/>
+      <rect x="65" y="38" width="50" height="14" fill="#FF9800" rx="2"/>
+      <text x="90" y="49" text-anchor="middle" font-size="9" fill="#FFF" font-family="sans-serif">.ZIP</text>
+      <text x="90" y="78" text-anchor="middle" font-size="11" fill="#333" font-family="sans-serif">clickJSON-</text>
+      <text x="90" y="93" text-anchor="middle" font-size="11" fill="#333" font-family="sans-serif">v0.2.0.zip</text>
+      <text x="90" y="118" text-anchor="middle" font-size="10" fill="#999" font-family="sans-serif">17.7 KB</text>
+      <!-- arrow -->
+      <text x="190" y="85" font-size="28" fill="#4CAF50" font-family="sans-serif">&#8594;</text>
+      <text x="185" y="105" font-size="10" fill="#666" font-family="sans-serif">解凍</text>
+      <!-- folder -->
+      <rect x="240" y="30" width="250" height="100" fill="#FFF" stroke="#CCC" rx="4"/>
+      <rect x="248" y="38" width="80" height="16" fill="#FFC107" rx="3"/>
+      <text x="288" y="50" text-anchor="middle" font-size="10" fill="#FFF" font-family="sans-serif">chrome-mv3</text>
+      <text x="260" y="74" font-size="11" fill="#333" font-family="sans-serif">manifest.json</text>
+      <text x="260" y="90" font-size="11" fill="#333" font-family="sans-serif">popup.html</text>
+      <text x="260" y="106" font-size="11" fill="#333" font-family="sans-serif">background.js</text>
+      <text x="380" y="74" font-size="11" fill="#333" font-family="sans-serif">content-scripts/</text>
+      <text x="380" y="90" font-size="11" fill="#333" font-family="sans-serif">chunks/</text>
+      <text x="380" y="106" font-size="11" fill="#333" font-family="sans-serif">assets/</text>
+    </svg>
+    <div class="caption">zipファイルを解凍すると、chrome-mv3 フォルダが展開されます</div>
+  </div>
+
+  <div class="warning">
+    解凍後のフォルダは<strong>削除・移動しないでください</strong>。Chrome が拡張機能の読み込み元として参照し続けます。デスクトップや Documents フォルダなど、安定した場所に置いてください。
+  </div>
+</div>
+
+<!-- Step 2 -->
+<div class="step">
+  <div class="step-number">2</div>
+  <h3>Chrome の拡張機能管理ページを開く</h3>
+  <p>Chrome のアドレスバーに以下を入力して Enter を押してください。</p>
+  <p style="text-align:center; margin: 12px 0;">
+    <code style="font-size: 16px; padding: 6px 16px;">chrome://extensions</code>
+  </p>
+  <div class="note">
+    Edge をお使いの場合: <code>edge://extensions</code> と入力してください。
+  </div>
+</div>
+
+<!-- Step 3 -->
+<div class="step">
+  <div class="step-number">3</div>
+  <h3>開発者モードをオンにする</h3>
+  <p>拡張機能管理ページの<strong>右上</strong>にある「<strong>デベロッパー モード</strong>」のトグルスイッチを<strong>オン</strong>にしてください。</p>
+
+  <div class="illustration">
+    <svg width="520" height="120" viewBox="0 0 520 120" xmlns="http://www.w3.org/2000/svg">
+      <rect width="520" height="120" fill="#F5F5F5" rx="8"/>
+      <!-- Chrome header -->
+      <rect x="20" y="15" width="480" height="40" fill="#FFF" stroke="#DDD" rx="4"/>
+      <text x="35" y="40" font-size="16" font-weight="bold" fill="#333" font-family="sans-serif">拡張機能</text>
+      <!-- toggle OFF -->
+      <rect x="300" y="25" width="44" height="22" fill="#CCC" rx="11"/>
+      <circle cx="313" cy="36" r="9" fill="#FFF"/>
+      <text x="350" y="40" font-size="12" fill="#666" font-family="sans-serif">デベロッパー モード</text>
+      <!-- arrow -->
+      <text x="250" y="80" font-size="24" fill="#4CAF50" font-family="sans-serif">&#8595;</text>
+      <!-- toggle ON -->
+      <rect x="300" y="85" width="44" height="22" fill="#4CAF50" rx="11"/>
+      <circle cx="333" cy="96" r="9" fill="#FFF"/>
+      <text x="350" y="100" font-size="12" fill="#4CAF50" font-weight="bold" font-family="sans-serif">デベロッパー モード ON</text>
+      <!-- highlight -->
+      <rect x="293" y="80" width="180" height="32" fill="none" stroke="#FF5722" stroke-width="2" stroke-dasharray="4" rx="6"/>
+    </svg>
+    <div class="caption">右上のトグルスイッチをオンにします</div>
+  </div>
+</div>
+
+<!-- Step 4 -->
+<div class="step">
+  <div class="step-number">4</div>
+  <h3>拡張機能を読み込む</h3>
+  <p>開発者モードをオンにすると、ページ上部に3つのボタンが表示されます。左端の「<strong>パッケージ化されていない拡張機能を読み込む</strong>」をクリックしてください。</p>
+
+  <div class="illustration">
+    <svg width="520" height="100" viewBox="0 0 520 100" xmlns="http://www.w3.org/2000/svg">
+      <rect width="520" height="100" fill="#F5F5F5" rx="8"/>
+      <!-- 3 buttons -->
+      <rect x="20" y="30" width="240" height="40" fill="#FFF" stroke="#4CAF50" stroke-width="2" rx="4"/>
+      <text x="140" y="55" text-anchor="middle" font-size="13" fill="#4CAF50" font-weight="bold" font-family="sans-serif">パッケージ化されていない拡張機能を読み込む</text>
+      <rect x="275" y="30" width="100" height="40" fill="#FFF" stroke="#DDD" rx="4"/>
+      <text x="325" y="55" text-anchor="middle" font-size="12" fill="#666" font-family="sans-serif">拡張機能をパック</text>
+      <rect x="390" y="30" width="110" height="40" fill="#FFF" stroke="#DDD" rx="4"/>
+      <text x="445" y="55" text-anchor="middle" font-size="12" fill="#666" font-family="sans-serif">更新</text>
+      <!-- highlight arrow -->
+      <text x="130" y="23" text-anchor="middle" font-size="14" fill="#FF5722" font-weight="bold" font-family="sans-serif">&#9660; ここをクリック</text>
+    </svg>
+    <div class="caption">「パッケージ化されていない拡張機能を読み込む」をクリック</div>
+  </div>
+
+  <p>フォルダ選択ダイアログが開くので、<strong>Step 1 で解凍したフォルダ</strong>（<code>chrome-mv3</code> フォルダ）を選択し、「フォルダーの選択」をクリックしてください。</p>
+
+  <div class="warning">
+    <strong>注意:</strong> <code>chrome-mv3</code> フォルダの<strong>中身</strong>ではなく、<code>chrome-mv3</code> フォルダ<strong>自体</strong>を選択してください。フォルダ内に <code>manifest.json</code> が存在する必要があります。
+  </div>
+</div>
+
+<!-- Step 5 -->
+<div class="step">
+  <div class="step-number">5</div>
+  <h3>インストール完了を確認</h3>
+  <p>正常にインストールされると、拡張機能一覧に <strong>「clickJSON」</strong> が表示されます。</p>
+
+  <div class="illustration">
+    <svg width="520" height="130" viewBox="0 0 520 130" xmlns="http://www.w3.org/2000/svg">
+      <rect width="520" height="130" fill="#F5F5F5" rx="8"/>
+      <!-- Extension card -->
+      <rect x="30" y="15" width="460" height="100" fill="#FFF" stroke="#DDD" rx="8"/>
+      <!-- icon placeholder -->
+      <rect x="50" y="35" width="48" height="48" fill="#4CAF50" rx="8"/>
+      <text x="74" y="63" text-anchor="middle" font-size="18" fill="#FFF" font-weight="bold" font-family="sans-serif">{}</text>
+      <!-- info -->
+      <text x="115" y="48" font-size="16" font-weight="bold" fill="#333" font-family="sans-serif">clickJSON</text>
+      <text x="115" y="66" font-size="12" fill="#999" font-family="sans-serif">HRMOS/HERPの求人票ページから構造化JSONを抽出</text>
+      <text x="115" y="84" font-size="11" fill="#BBB" font-family="sans-serif">バージョン 0.1.0</text>
+      <!-- toggle on -->
+      <rect x="410" y="45" width="44" height="22" fill="#4CAF50" rx="11"/>
+      <circle cx="443" cy="56" r="9" fill="#FFF"/>
+      <!-- check mark -->
+      <text x="370" y="97" font-size="13" fill="#4CAF50" font-family="sans-serif">&#10003; インストール済み</text>
+    </svg>
+    <div class="caption">拡張機能一覧に clickJSON が表示されれば成功です</div>
+  </div>
+
+  <div class="note">
+    ツールバーにアイコンが表示されない場合は、Chrome ツールバー右側の<strong>パズルアイコン</strong>（拡張機能メニュー）をクリックし、clickJSON の横にある<strong>ピンアイコン</strong>をクリックしてください。
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>4. 使い方</h2>
+
+<!-- Usage Step 1 -->
+<div class="step">
+  <div class="step-number">1</div>
+  <h3>対応ATSの求人票ページを開く</h3>
+  <p>対応ATSのAgent画面で求人票ページを表示します。拡張機能が対応ページを検出すると、ツールバーのアイコンにATS名のバッジが表示されます。</p>
+
+  <div class="illustration">
+    <svg width="520" height="80" viewBox="0 0 520 80" xmlns="http://www.w3.org/2000/svg">
+      <rect width="520" height="80" fill="#F5F5F5" rx="8"/>
+      <!-- toolbar area -->
+      <rect x="20" y="15" width="480" height="50" fill="#FFF" stroke="#DDD" rx="4"/>
+      <!-- URL bar -->
+      <rect x="30" y="25" width="320" height="30" fill="#F0F0F0" rx="15"/>
+      <text x="50" y="45" font-size="12" fill="#666" font-family="sans-serif">https://hrmos.co/agent/corporates/acme/jobs/123/detail</text>
+      <!-- Extension icon with badge -->
+      <rect x="420" y="27" width="28" height="28" fill="#4CAF50" rx="4"/>
+      <text x="434" y="45" text-anchor="middle" font-size="12" fill="#FFF" font-weight="bold" font-family="monospace">{}</text>
+      <!-- badge -->
+      <rect x="438" y="23" width="46" height="14" fill="#F44336" rx="7"/>
+      <text x="461" y="33" text-anchor="middle" font-size="8" fill="#FFF" font-weight="bold" font-family="sans-serif">HRMOS</text>
+      <!-- label -->
+      <text x="395" y="70" font-size="11" fill="#666" font-family="sans-serif">&#8593; バッジが表示される</text>
+    </svg>
+    <div class="caption">対応ページでは拡張アイコンにATS名のバッジが表示されます</div>
+  </div>
+</div>
+
+<!-- Usage Step 2 -->
+<div class="step">
+  <div class="step-number">2</div>
+  <h3>拡張アイコンをクリック → 「求人票を抽出」</h3>
+  <p>ツールバーの clickJSON アイコンをクリックすると、ポップアップが表示されます。<br>
+  「<strong>XXXX Agent 求人ページを検出</strong>」と表示されていることを確認し、緑色の「<strong>求人票を抽出</strong>」ボタンをクリックしてください。</p>
+
+  <div class="illustration">
+    <svg width="300" height="200" viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg">
+      <rect width="300" height="200" fill="#F5F5F5" rx="8"/>
+      <!-- popup window -->
+      <rect x="30" y="10" width="240" height="180" fill="#FFF" stroke="#DDD" rx="8" filter="url(#shadow)"/>
+      <defs><filter id="shadow"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.15"/></filter></defs>
+      <!-- title -->
+      <text x="50" y="40" font-size="16" font-weight="bold" fill="#333" font-family="sans-serif">clickJSON</text>
+      <!-- status -->
+      <text x="50" y="62" font-size="12" fill="#666" font-family="sans-serif">HRMOS Agent 求人ページを検出</text>
+      <!-- extract button -->
+      <rect x="50" y="78" width="200" height="36" fill="#4CAF50" rx="4"/>
+      <text x="150" y="101" text-anchor="middle" font-size="14" fill="#FFF" font-weight="bold" font-family="sans-serif">求人票を抽出</text>
+      <!-- arrow -->
+      <text x="150" y="135" text-anchor="middle" font-size="20" fill="#4CAF50" font-family="sans-serif">&#8595;</text>
+      <!-- copy button -->
+      <rect x="50" y="142" width="200" height="36" fill="#2196F3" rx="4"/>
+      <text x="150" y="165" text-anchor="middle" font-size="14" fill="#FFF" font-weight="bold" font-family="sans-serif">JSON をコピー</text>
+    </svg>
+    <div class="caption">ポップアップから求人票を抽出し、JSONをコピーできます</div>
+  </div>
+</div>
+
+<!-- Usage Step 3 -->
+<div class="step">
+  <div class="step-number">3</div>
+  <h3>JSONをコピー</h3>
+  <p>抽出が完了すると、画面下部にJSON形式のデータが表示されます。<br>
+  青色の「<strong>JSONをコピー</strong>」ボタンをクリックすると、クリップボードにコピーされます。</p>
+  <p>コピーしたJSONは、スプレッドシートやその他のツールに貼り付けて活用できます。</p>
+</div>
+
+<!-- ============================================================ -->
+<h2>5. 対応ページの詳細</h2>
+<table class="ats-table">
+  <thead>
+    <tr><th>ATS名</th><th>対応URL パターン</th><th>備考</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>HRMOS</strong></td>
+      <td><code>hrmos.co/agent/corporates/*/jobs/*/detail</code></td>
+      <td>Agent画面の求人詳細ページ</td>
+    </tr>
+    <tr>
+      <td><strong>HERP</strong></td>
+      <td><code>agent.herp.cloud/p/*/requisitions/id/*</code></td>
+      <td>Agent画面の求人要件ページ</td>
+    </tr>
+    <tr>
+      <td><strong>Talentio</strong></td>
+      <td><code>agent.talentio.com/r/ats/requisitions/*/candidates/new</code></td>
+      <td>Agent画面の候補者推薦ページ</td>
+    </tr>
+    <tr>
+      <td><strong>PERSONA</strong></td>
+      <td><code>www.agent.persona-ats.com</code></td>
+      <td>Agent画面全般（SPA）<br>求人詳細を表示した状態で抽出</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- ============================================================ -->
+<h2>6. トラブルシューティング</h2>
+<div class="card">
+  <dl class="troubleshooting">
+    <dt>Q: ツールバーに clickJSON のアイコンが見つからない</dt>
+    <dd>
+      Chrome ツールバー右側の<strong>パズルアイコン</strong>（拡張機能）をクリックし、clickJSON の右にある<strong>ピンマーク</strong>をクリックしてツールバーに固定してください。
+    </dd>
+
+    <dt>Q: 「対応していないページです」と表示される</dt>
+    <dd>
+      現在開いているページが上記の対応URLパターンに一致していません。正しいATSのAgent画面で求人詳細ページを開いているか確認してください。
+    </dd>
+
+    <dt>Q: PERSONA で「PERSONA求人詳細ページを判別できませんでした」と表示される</dt>
+    <dd>
+      PERSONAはSPA（シングルページアプリケーション）のため、ログイン画面や一覧画面では抽出できません。<strong>求人票の詳細が表示されている状態</strong>で「求人票を抽出」をクリックしてください。
+    </dd>
+
+    <dt>Q: 抽出結果のJSONが空（nullばかり）になる</dt>
+    <dd>
+      ページの読み込みが完了する前に抽出を実行した可能性があります。ページを完全に読み込んでから再度お試しください。
+    </dd>
+
+    <dt>Q: 「通信エラーが発生しました」と表示される</dt>
+    <dd>
+      ページをリロードしてから再度お試しください。それでも解消しない場合は、<code>chrome://extensions</code> で clickJSON を一度無効にしてから有効に戻してください。
+    </dd>
+
+    <dt>Q: 拡張機能を更新したい</dt>
+    <dd>
+      新しいバージョンのzipファイルを受け取ったら、解凍して既存のフォルダを上書きし、<code>chrome://extensions</code> で clickJSON の<strong>更新ボタン</strong>（丸い矢印アイコン）をクリックしてください。
+    </dd>
+  </dl>
+</div>
+
+<!-- ============================================================ -->
+<h2>7. クイックリファレンス</h2>
+<div class="card" style="background: var(--primary-light);">
+  <table style="width: 100%; font-size: 14px;">
+    <tr><td style="width:30%; font-weight:600;">インストール先</td><td><code>chrome://extensions</code> → 開発者モード ON → パッケージ化されていない拡張機能を読み込む</td></tr>
+    <tr><td style="font-weight:600;">使い方</td><td>対応ATS求人ページを開く → clickJSON アイコンクリック → 「求人票を抽出」 → 「JSONをコピー」</td></tr>
+    <tr><td style="font-weight:600;">更新方法</td><td>新zipを解凍して上書き → <code>chrome://extensions</code> で更新ボタン</td></tr>
+    <tr><td style="font-weight:600;">ショートカット</td><td><span class="kbd">Ctrl</span> + <span class="kbd">Shift</span> + <span class="kbd">V</span> でペースト（書式なし）</td></tr>
+  </table>
+</div>
+
+<footer>
+  <p>clickJSON v0.2.0 | 最終更新: 2026-02-26</p>
+</footer>
+
+</div>
+</body>
+</html>
